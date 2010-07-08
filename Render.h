@@ -12,7 +12,7 @@ void  RenderLetterboxToggle ();
 int   RenderMaxTextureSize ();
 void  RenderResize ();
 void  RenderTerm ();
-void  RenderUpdate ();
+void  RenderUpdate (int picking);
 bool  RenderWireframe ();
 void  RenderWireframeToggle ();
 void  RenderHelpToggle ();

@@ -224,7 +224,7 @@ void AppUpdate ()
   TextureUpdate ();
   VisibleUpdate ();
   CarUpdate ();
-  RenderUpdate ();
+  RenderUpdate (0);
 
 }
 

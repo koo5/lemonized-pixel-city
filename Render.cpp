@@ -765,7 +765,7 @@ void RenderFogFX (float scalar)
 
 -----------------------------------------------------------------------------*/
 
-void RenderUpdate (void)		
+void RenderUpdate (int picking)		
 {
 
   GLvector        pos;
