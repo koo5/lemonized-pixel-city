@@ -17,7 +17,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <gl\glaux.h>
+//#include <gl\glaux.h>
 #else
 #include <stdlib.h>
 #endif
@@ -413,8 +413,8 @@ static void do_reset (void)
   GLrgba    building_color;
   float     west_street, north_street, east_street, south_street;
 
-  //Re-init Random to make the same city each time. Helpful when running tests.
-  RandomInit (6);
+  ////Re-init Random to make the same city each time. Helpful when running tests.
+  RandomInit (time(NULL));
   reset_needed = false;
   broadway_done = false;
   skyscrapers = 0;

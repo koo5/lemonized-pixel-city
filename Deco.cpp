@@ -15,7 +15,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <gl\glaux.h>
+//#include <gl\glaux.h>
 #endif
 #include <math.h>
 #include <GL/gl.h>
