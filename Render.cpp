@@ -403,6 +403,7 @@ void RenderPrint (int x, int y, int font, GLrgba color, const char *fmt, ...)
   //glPushAttrib(GL_LIST_BIT);
   //glListBase(fonts[font % FONT_COUNT].base_char - 32);
   glColor3fv (&color.red);
+#ifndef _lemon
 	glRasterPos2i (x, y);
   //glCallLists(strlen(text), GL_UNSIGNED_BYTE, text);
 
@@ -410,6 +411,11 @@ void RenderPrint (int x, int y, int font, GLrgba color, const char *fmt, ...)
   char * ptr = text;
   while (*ptr)
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *ptr++);
+#else
+
+  //draw_text	
+
+#endif
 
 }
 
@@ -510,7 +516,9 @@ void RenderResize (void)
   } else 
     letterbox_offset = 0;
   //render_aspect = (float)render_height / (float)render_width;
+#ifndef _lemon
   glViewport (0, letterbox_offset, render_width, render_height);
+#endif
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
   render_aspect = (float)render_width / (float)render_height;
@@ -521,7 +529,6 @@ void RenderResize (void)
 	glMatrixMode (GL_MODELVIEW);
 
 }
-
 /*-----------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------*/
@@ -589,12 +596,14 @@ void RenderInit (void)
   effect = IniInt ("Effect");
   flat = IniInt ("Flat") != 0;
   fog_distance = WORLD_HALF;
+#ifndef _lemon
   //clear the viewport so the user isn't looking at trash while the program starts
   glViewport (0, 0, WinWidth (), WinHeight ());
   glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   SwapBuffers (hDC);
   RenderResize ();
+#endif
 
 }
 
@@ -775,16 +784,20 @@ void RenderUpdate (int picking)
 
   frames++;
   do_fps ();
-  glViewport (0, 0, WinWidth (), WinHeight ());
-  glDepthMask (true);
-  glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
   glEnable(GL_DEPTH_TEST);
+  glDepthMask (true);
+  #ifndef _lemon
+  glViewport (0, 0, WinWidth (), WinHeight ());
+  glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   if (letterbox) 
     glViewport (0, letterbox_offset, render_width, render_height);
+  #endif
   if (LOADING_SCREEN && TextureReady () && !EntityReady ()) {
     do_effects (EFFECT_NONE);
+    #ifndef _lemon
     SwapBuffers (hDC);
+    #endif
     return;
   }
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
@@ -859,6 +872,8 @@ void RenderUpdate (int picking)
   //Show the help overlay
   if (show_help)
     do_help ();
+#ifndef _lemon
   SwapBuffers (hDC);
+#endif
 
 }

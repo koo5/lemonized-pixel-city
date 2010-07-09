@@ -13,7 +13,6 @@
 
 #include <time.h>
 #include <map>
-
 class pixel_city: public obj
 {
     public:
@@ -72,10 +71,13 @@ class pixel_city: public obj
 	    case SDLK_b:
 	    CameraNextBehavior();
 	    break;
+	    default:
+	    obj::keyp(key,uni,mod);
 	}
     }
     void draw (int picking)
     {
+        glPushAttrib(GL_ALL_ATTRIB_BITS);
 	if(!picking)
 	{
 	    CameraUpdate ();
@@ -85,12 +87,13 @@ class pixel_city: public obj
             VisibleUpdate ();
             CarUpdate ();
         }
+        RenderResize();
         RenderUpdate (picking);
+        glPopAttrib();
     }
     pixel_city()
     {
-	time_t t=time (NULL);
-	RandomInit (t);
+	RandomInit (time (NULL));
 	CameraInit ();
         RenderInit ();
         TextureInit ();
@@ -102,15 +105,16 @@ class pixel_city: public obj
 	WorldTerm ();
 	RenderTerm ();
 	CameraTerm ();
-	WinTerm ();
     }
     SAVE(pixel_city)
     {
 	YAML_EMIT_PARENT_MEMBERS(out,obj)
+	save(ini)
     }
     LOAD
     {
 	YAML_LOAD_PARENT_MEMBERS(doc,obj)
+	load(ini)
     }
 	
     static map<string,string>ini;
@@ -166,3 +170,12 @@ GLvector IniVector (char* entry)
     sscanf (I->second.c_str(), FORMAT_VECTOR, &v.x, &v.y, &v.z);
     return v;
 }
+int WinWidth()
+{
+    return w;
+}
+int WinHeight()
+{
+    return h;
+}
+
