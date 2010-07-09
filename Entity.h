@@ -11,9 +11,9 @@ class CEntity
 private:
 protected:
 
-  GLvector                _center;
 
 public:
+  GLvector                _center;
                           CEntity (void);
   virtual                 ~CEntity () {};
   virtual void            Render (void);

@@ -46,7 +46,7 @@
 #include "Texture.h"
 #include "World.h"
 #include "Win.h"
-
+void gle(void);
 static char*        prefix[] = 
 {
   "i", 
@@ -474,8 +474,10 @@ void CTexture::DrawSky ()
   glVertex2i (_size, _size - 2);  
   glEnd ();
   //Draw a bunch of little faux-buildings on the horizon.
+  gle();
   for (i = 0; i < _size; i += 5) 
     drawrect (i, _size - RandomVal (8) - RandomVal (8) - RandomVal (8), i + RandomVal (9), _size, glRgba (0.0f));
+  gle();
   //Draw the clouds
   for (i = _size - 30; i > 5; i -= 2) {
 
@@ -494,6 +496,7 @@ void CTexture::DrawSky ()
     glEnable (GL_TEXTURE_2D);
     glBindTexture (GL_TEXTURE_2D, TextureId (TEXTURE_SOFT_CIRCLE));
     glDepthMask (false);
+    gle();
     glBegin (GL_QUADS);
     for (offset = -_size; offset <= _size; offset += _size) {
       for (scale = 1.0f; scale > 0.0f; scale -= 0.25f) {
@@ -503,20 +506,26 @@ void CTexture::DrawSky ()
           color = WorldBloomColor () * 0.1f;
         else
           color = glRgba (0.0f);
+	gle();
         color.alpha = 0.2f;
         glColor4fv (&color.red);
         width_adjust = (int)((float)width / 2.0f + (int)(inv_scale * ((float)width / 2.0f)));
         height_adjust = height + (int)(scale * (float)height * 0.99f);
+          gle();
+
         glTexCoord2f (0, 0);   glVertex2i (offset + x - width_adjust, y + height - height_adjust);
         glTexCoord2f (0, 1);   glVertex2i (offset + x - width_adjust, y + height);
         glTexCoord2f (1, 1);   glVertex2i (offset + x + width_adjust, y + height);
         glTexCoord2f (1, 0);   glVertex2i (offset + x + width_adjust, y + height - height_adjust);
+	gle();
       }
 
     }
-  }
   glEnd ();
+  gle();
 
+  }
+  gle();
 }
 
 /*-----------------------------------------------------------------------------
@@ -606,11 +615,13 @@ void CTexture::Rebuild ()
   //Set up our viewport so that drawing into our texture will be as easy 
   //as possible.  We make the viewport and projection simply match the given 
   //texture size. 
+  gle();
   glViewport(0, 0, _size , _size);
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
   glOrtho (0, _size, _size, 0, 0.1f, 2048);
 	glMatrixMode (GL_MODELVIEW);
+  gle();
   glPushMatrix ();
   glLoadIdentity();
   glDisable (GL_CULL_FACE);
@@ -619,12 +630,14 @@ void CTexture::Rebuild ()
   glTranslatef(0, 0, -10.0f);
   glClearColor (0, 0, 0, _masked ? 0.0f : 1.0f);
   glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  gle();
   use_framebuffer = true;
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+  gle();
   switch (_my_id) {
   case TEXTURE_LATTICE:
     glLineWidth (2.0f);
-
+    gle();
     glColor3f (0,0,0);
     glBegin (GL_LINES);
     glVertex2i (0, 0);  glVertex2i (_size, _size);//diagonal
@@ -633,6 +646,8 @@ void CTexture::Rebuild ()
     glEnd ();
     glBegin (GL_LINE_STRIP);
     glVertex2i (0, 0);    
+    gle();
+
     for (i = 0; i < _size; i += 9) {
       if (i % 2)
         glVertex2i (0, i);    
@@ -646,6 +661,8 @@ void CTexture::Rebuild ()
         glVertex2i (i, i);    
     }
     glEnd ();
+    gle();
+
     break;
   case TEXTURE_SOFT_CIRCLE:
     //Make a simple circle of light, bright in the center and fading out
@@ -656,12 +673,14 @@ void CTexture::Rebuild ()
     glColor4f (1, 1, 1, 1);
     glVertex2i (_half, _half);
     glColor4f (0, 0, 0, 0);
+    
     for (i = 0; i <= 360; i++) {
       pos.x = sinf ((float)i * DEGREES_TO_RADIANS) * radius;
       pos.y = cosf ((float)i * DEGREES_TO_RADIANS) * radius;
       glVertex2i (_half + (int)pos.x, _half + (int)pos.y);
     }
     glEnd ();
+    gle();
     break;
   case TEXTURE_LIGHT:
     glEnable (GL_BLEND);
@@ -683,9 +702,11 @@ void CTexture::Rebuild ()
       }
       glEnd ();
     }
+    gle();
     break;
   case TEXTURE_HEADLIGHT:
     DrawHeadlight ();
+    gle();
     break;
   case TEXTURE_LOGOS:
     i = 0;
@@ -706,6 +727,7 @@ void CTexture::Rebuild ()
       suffix_num = (suffix_num + 1) % SUFFIX_COUNT;
       i += LOGO_PIXELS;
     }
+    gle();
     break;
   case TEXTURE_TRIM:
     int     margin;
@@ -722,12 +744,15 @@ void CTexture::Rebuild ()
     y += TRIM_PIXELS;
     for (x = 0; x < _size; x += TRIM_PIXELS) 
       drawrect_simple (x + margin, y + margin * 2, x + TRIM_PIXELS - margin, y + TRIM_PIXELS - margin, glRgba (1.0f), glRgba (0.5f));
+    gle();
     break;
   case TEXTURE_SKY:
     DrawSky ();
+    gle();
     break;
   default: //building textures
     DrawWindows ();
+    gle();
     break;
   }
   glPopMatrix ();
@@ -750,7 +775,7 @@ void CTexture::Rebuild ()
   _ready = true;
   lapsed = GetTickCount () - start;
   build_time += lapsed;
-    
+gle();
 
 }
 
@@ -815,27 +840,30 @@ bool TextureReady ()
 
 void TextureUpdate (void)
 {
-
+gle();
   if (textures_done) {
     if (!RenderBloom ())
       return;
     CTexture*   t;
-
+gle();
     for (t = head; t; t = t->_next) {
       if (t->_my_id != TEXTURE_BLOOM) 
         continue;
       do_bloom (t);
+      gle();
       return;
     }
   }
+  gle();
   for (CTexture* t = head; t; t = t->_next) {
     if (!t->_ready) {
       t->Rebuild();
+      gle();
       return;
     }
   } 
   textures_done = true;
-
+  gle();
 }
 
 /*-----------------------------------------------------------------------------

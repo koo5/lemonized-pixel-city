@@ -237,8 +237,8 @@ void AppInit (void)
 {
 
   RandomInit (time (NULL));
-  CameraInit ();
   RenderInit ();
+  CameraInit ();
   TextureInit ();
   WorldInit ();
 

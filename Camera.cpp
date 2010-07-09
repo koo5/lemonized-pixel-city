@@ -184,7 +184,7 @@ void CameraAutoToggle ()
 {
 
   cam_auto = !cam_auto;
-
+  IniIntSet("cam_auto" , cam_auto);
 }
 
 /*-----------------------------------------------------------------------------
@@ -196,6 +196,7 @@ void CameraNextBehavior ()
 
   camera_behavior++;
   camera_behavior %= CAMERA_MODES;
+  IniIntSet("camera_behavior",camera_behavior);
 
 }
 
@@ -363,6 +364,8 @@ void CameraInit (void)
 
   angle = IniVector ("CameraAngle");
   position = IniVector ("CameraPosition");
+  cam_auto=1;//IniInt("cam_auto");
+  camera_behavior=IniInt("camera_behavior");
 
 }
 

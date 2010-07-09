@@ -13,6 +13,9 @@
 
 #include <time.h>
 #include <map>
+
+void Viewport();
+
 class pixel_city: public obj
 {
     public:
@@ -77,27 +80,45 @@ class pixel_city: public obj
     }
     void draw (int picking)
     {
+	gle();
         glPushAttrib(GL_ALL_ATTRIB_BITS);
+        gle();
 	if(!picking)
 	{
 	    CameraUpdate ();
+	    gle();
 	    EntityUpdate ();
+	    gle();
     	    WorldUpdate ();
+	    gle();
     	    TextureUpdate ();
+	    gle();
             VisibleUpdate ();
+	    gle();
             CarUpdate ();
         }
+        gle();
         RenderResize();
+        gle();
         RenderUpdate (picking);
+        resetviewport();
+        gle();
         glPopAttrib();
+        gle();
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glMatrixMode(GL_MODELVIEW);
     }
+    int getDirty(){return 1;}
     pixel_city()
     {
 	RandomInit (time (NULL));
-	CameraInit ();
         RenderInit ();
+	CameraInit ();
         TextureInit ();
         WorldInit ();
+        resetviewport();
+        
     }
     ~pixel_city()
     {
@@ -109,25 +130,21 @@ class pixel_city: public obj
     SAVE(pixel_city)
     {
 	YAML_EMIT_PARENT_MEMBERS(out,obj)
-	save(ini)
     }
     LOAD
     {
-	YAML_LOAD_PARENT_MEMBERS(doc,obj)
-	load(ini)
+
     }
-	
-    static map<string,string>ini;
 };
-map<string,string>pixel_city::ini;
+map<string,string>pixel_city_ini;
 #define FORMAT_VECTOR       "%f %f %f"
 #define MAX_RESULT          256
 #define FORMAT_FLOAT        "%1.2f"
 int IniInt (char* entry)
 {
     map<string,string>::iterator I;
-    I=pixel_city::ini.find(entry);
-    if(I==pixel_city::ini.end())
+    I=pixel_city_ini.find(entry);
+    if(I==pixel_city_ini.end())
     return 0;
     else
     return atoi(I->second.c_str());
@@ -136,13 +153,13 @@ void IniIntSet (char* entry, int val)
 {
   char        buf[20];
   sprintf (buf, "%d", val);
-  pixel_city::ini[entry]=buf;
+  pixel_city_ini[entry]=buf;
 }
 float IniFloat (char* entry)
 {
     map<string,string>::iterator I;
-    I=pixel_city::ini.find(entry);
-    if(I==pixel_city::ini.end())
+    I=pixel_city_ini.find(entry);
+    if(I==pixel_city_ini.end())
     return 0;
     else
     return atof(I->second.c_str());
@@ -151,20 +168,20 @@ void IniFloatSet (char* entry, float val)
 {
   char        buf[20];
   sprintf (buf, FORMAT_FLOAT, val);
-  pixel_city::ini[entry]=buf;
+  pixel_city_ini[entry]=buf;
 }
 void IniVectorSet (char* entry, GLvector v)
 {
   char result[MAX_RESULT]; 
   sprintf (result, FORMAT_VECTOR, v.x, v.y, v.z);
-  pixel_city::ini[entry]=result;
+  pixel_city_ini[entry]=result;
 }
 GLvector IniVector (char* entry)
 {
     GLvector  v;
     map<string,string>::iterator I;
-    I=pixel_city::ini.find(entry);
-    if(I==pixel_city::ini.end())
+    I=pixel_city_ini.find(entry);
+    if(I==pixel_city_ini.end())
     v.x = v.y = v.z = 0.0f;
     else
     sscanf (I->second.c_str(), FORMAT_VECTOR, &v.x, &v.y, &v.z);
@@ -178,4 +195,5 @@ int WinHeight()
 {
     return h;
 }
+
 

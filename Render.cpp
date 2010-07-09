@@ -88,6 +88,8 @@ static char             help[] =
   "E   - Change full-scene effects\n"
   "T   - Toggle Textures\n"
   "G   - Toggle Fog\n"
+  "C   - Toggle camera auto/manual\n"
+  "B   - Auto camera mode\n"
 ;
 
 struct glFont
@@ -387,7 +389,29 @@ int RenderMaxTextureSize ()
 /*-----------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------*/
+void gle(void);
+#ifndef _lemon
+void gle(void)
+{
+	GLenum gl_error;
+	gl_error = glGetError( );
+	if( gl_error != GL_NO_ERROR )
+	{
+	    if(gl_error==GL_STACK_UNDERFLOW)
+		printf("QUACK QUACK QUACK, UNDERFLOVING STACK\n");
+	    else if(gl_error==GL_STACK_OVERFLOW)
+		printf("QUACK QUACK QUACK, OVERFLOVING STACK\n");
+	    else if(gl_error==GL_INVALID_OPERATION)
+		printf("INVALID OPERATION, PATIENT EXPLODED\n");
+	    else if(gl_error==GL_INVALID_VALUE)
+		printf("GL_INVALID_VALUE\n");
+	    else
+		printf("OpenGL error: 0x%X\n", gl_error );
+	}
+}
+#endif
 
+void draw_text(const char *t);
 void RenderPrint (int x, int y, int font, GLrgba color, const char *fmt, ...)
 {
 
@@ -402,7 +426,9 @@ void RenderPrint (int x, int y, int font, GLrgba color, const char *fmt, ...)
   va_end(ap);		
   //glPushAttrib(GL_LIST_BIT);
   //glListBase(fonts[font % FONT_COUNT].base_char - 32);
+  gle();
   glColor3fv (&color.red);
+  gle();
 #ifndef _lemon
 	glRasterPos2i (x, y);
   //glCallLists(strlen(text), GL_UNSIGNED_BYTE, text);
@@ -412,11 +438,23 @@ void RenderPrint (int x, int y, int font, GLrgba color, const char *fmt, ...)
   while (*ptr)
     glutBitmapCharacter(GLUT_BITMAP_HELVETICA_12, *ptr++);
 #else
-
-  //draw_text	
-
+  glPushAttrib(GL_BLEND);
+  glMatrixMode(GL_PROJECTION);
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(0,render_width,render_height,0,-1,1);
+  glMatrixMode(GL_MODELVIEW);
+  glPushMatrix();
+  glLoadIdentity();
+  glTranslatef(x,y,0);
+  glEnable(GL_BLEND);
+  draw_text(text);
+  glPopMatrix();
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glPopAttrib();
+  glMatrixMode(GL_MODELVIEW);
 #endif
-
 }
 
 /*-----------------------------------------------------------------------------
@@ -437,26 +475,39 @@ void RenderPrint (int line, const char *fmt, ...)
   va_end (ap);		
   glMatrixMode (GL_PROJECTION);
   glPushMatrix ();
+  gle();
   glLoadIdentity ();
   glOrtho (0, render_width, render_height, 0, 0.1f, 2048);
+  gle();
   glDisable(GL_DEPTH_TEST);
   glDepthMask (false);
-	glMatrixMode (GL_MODELVIEW);
+  glMatrixMode (GL_MODELVIEW);
+  gle();
   glPushMatrix ();
   glLoadIdentity();
   glTranslatef(0, 0, -1.0f);				
+  gle();
   glDisable (GL_BLEND);
   glDisable (GL_FOG);
   glDisable (GL_TEXTURE_2D);
+  gle();
   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+  gle();
   RenderPrint (0, line * FONT_SIZE - 2, 0, glRgba (0.0f), text);
+  gle();
+#ifndef _lemon
   RenderPrint (4, line * FONT_SIZE + 2, 0, glRgba (0.0f), text);
   RenderPrint (2, line * FONT_SIZE, 0, glRgba (1.0f), text);
-  glPopAttrib();						
+#endif
+//  glPopAttrib();						
   glPopMatrix ();
+  gle();
   glMatrixMode (GL_PROJECTION);
+  gle();
   glPopMatrix ();
+  gle();
   glMatrixMode (GL_MODELVIEW);
+  gle();
 
 }
 
@@ -516,9 +567,10 @@ void RenderResize (void)
   } else 
     letterbox_offset = 0;
   //render_aspect = (float)render_height / (float)render_width;
-#ifndef _lemon
-  glViewport (0, letterbox_offset, render_width, render_height);
-#endif
+  if(letterbox)
+    glViewport (0, letterbox_offset, render_width, render_height);
+  else
+    glViewport (0, 0, WinWidth (), WinHeight ());  
   glMatrixMode (GL_PROJECTION);
   glLoadIdentity ();
   render_aspect = (float)render_width / (float)render_height;
@@ -529,6 +581,7 @@ void RenderResize (void)
 	glMatrixMode (GL_MODELVIEW);
 
 }
+
 /*-----------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------*/
@@ -587,6 +640,7 @@ void RenderInit (void)
     IniIntSet ("SetDefaults", 1);
     IniIntSet ("Effect", EFFECT_BLOOM);
     IniIntSet ("ShowFog", 1);
+    IniIntSet ("cam_auto", 1);
   }
   //load in our settings
   letterbox = IniInt ("Letterbox") != 0;
@@ -781,7 +835,7 @@ void RenderUpdate (int picking)
   GLvector        angle;
   GLrgba          color;
   int             elapsed;
-
+  gle();
   frames++;
   do_fps ();
   glEnable(GL_DEPTH_TEST);
@@ -800,6 +854,7 @@ void RenderUpdate (int picking)
     #endif
     return;
   }
+  gle();
 	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   glShadeModel(GL_SMOOTH);
   glFogi (GL_FOG_MODE, GL_LINEAR);
@@ -824,7 +879,9 @@ void RenderUpdate (int picking)
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   //Render all the stuff in the whole entire world.
   glDisable (GL_FOG);
+  gle();
   SkyRender ();
+  gle();
   if (show_fog) {
     glEnable (GL_FOG);
     glFogf (GL_FOG_START, fog_distance - 100);
@@ -833,6 +890,7 @@ void RenderUpdate (int picking)
     glFogfv (GL_FOG_COLOR, &color.red);
   }
   WorldRender ();
+  gle();
   if (effect == EFFECT_GLASS_CITY) {
     glDisable (GL_CULL_FACE);
     glEnable (GL_BLEND);
@@ -846,7 +904,9 @@ void RenderUpdate (int picking)
     glEnable (GL_CULL_FACE);
     glDisable (GL_BLEND);
   }
+  gle();
   EntityRender ();
+  gle();
   if (!LOADING_SCREEN) {
     elapsed = 3000 - WorldSceneElapsed ();
     if (elapsed >= 0 && elapsed <= 3000) {
@@ -859,19 +919,24 @@ void RenderUpdate (int picking)
   } 
   if (EntityReady ())
     LightRender ();
+    gle();
   CarRender ();
   if (show_wireframe) {
     glDisable (GL_TEXTURE_2D);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     EntityRender ();
   }
+  gle();
   do_effects (effect);
+  gle();
   //Framerate tracker
   if (show_fps) 
     RenderPrint (1, "FPS=%d : Entities=%d : polys=%d", current_fps, EntityCount () + LightCount () + CarCount (), EntityPolyCount () + LightCount () + CarCount ());
+gle();
   //Show the help overlay
   if (show_help)
     do_help ();
+    gle();
 #ifndef _lemon
   SwapBuffers (hDC);
 #endif

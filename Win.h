@@ -73,3 +73,4 @@ bool  WinInit (void);
 int   WinWidth (void);
 int   WinHeight (void);
 void  WinMousePosition (int* x, int* y);
+void gle();

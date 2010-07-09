@@ -239,7 +239,6 @@ void EntityUpdate ()
 /*-----------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------*/
-
 void EntityRender ()
 {
 
@@ -247,26 +246,34 @@ void EntityRender ()
   bool      wireframe;
   int       x, y;
   int       elapsed;
-
+gle();
   //Draw all textured objects
   glGetIntegerv (GL_POLYGON_MODE, &polymode[0]);
+gle();
   wireframe = polymode[0] != GL_FILL;
   if (RenderFlat ())
     glDisable (GL_TEXTURE_2D);
   //If we're not using a loading screen, make the wireframe fade out via fog
   if (!LOADING_SCREEN && wireframe) {
     elapsed = 6000 - WorldSceneElapsed ();
-    if (elapsed >= 0 && elapsed <= 6000)
+    if (elapsed >= 0 && elapsed <= 6000){
+      gle();
       RenderFogFX ((float)elapsed / 6000.0f);
+      gle();
+      }
     else
       return;
   }
+gle();
+
   for (x = 0; x < GRID_SIZE; x++) {
     for (y = 0; y < GRID_SIZE; y++) {
       if (Visible (x,y))
         glCallList (cell_list[x][y].list_textured);
     }
   }
+gle();
+
   //draw all flat colored objects
   glBindTexture(GL_TEXTURE_2D, 0);
   glColor3f (0, 0, 0);
@@ -280,6 +287,8 @@ void EntityRender ()
       }
     }
   }
+gle();
+
   //draw all alpha-blended objects
   glBindTexture(GL_TEXTURE_2D, 0);
   glColor3f (0, 0, 0);
@@ -291,6 +300,7 @@ void EntityRender ()
       }
     }
   }
+gle();
   
 }
 
