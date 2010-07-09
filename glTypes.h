@@ -38,7 +38,7 @@ struct GLvector
   float       x;
   float       y;
   float       z;
-  OPERATORS(GLvector);
+  OPERATORS(GLvector)
 };
 
 typedef GLvector       GLvector3;
@@ -47,7 +47,7 @@ struct GLvector2
 {
   float       x;
   float       y;
-  OPERATORS(GLvector2);
+  OPERATORS(GLvector2)
 };
 
 struct GLrgba
@@ -56,7 +56,7 @@ struct GLrgba
   float       green;
   float       blue;
   float       alpha;
-  OPERATORS(GLrgba);
+  OPERATORS(GLrgba)
 };
 
 struct GLmatrix

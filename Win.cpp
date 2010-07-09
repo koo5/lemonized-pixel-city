@@ -1,3 +1,4 @@
+#ifndef _lemon
 /*-----------------------------------------------------------------------------
 
   Win.cpp
@@ -621,5 +622,7 @@ bool WinInit (void)
   return true;
 
 }
+
+#endif
 
 #endif

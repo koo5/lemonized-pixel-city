@@ -52,7 +52,7 @@ static GLvector     angle;
 static GLvector     position;
 static GLvector     auto_angle;
 static GLvector     auto_position;
-static float        distance;
+//static float        distance;
 static GLvector     movement;
 static bool         cam_auto;
 static float        tracker;

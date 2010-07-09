@@ -96,13 +96,13 @@ struct glFont
   unsigned		  base_char;
 } fonts[] = 
 {
-  "Courier New",      0,
-  "Arial",            0,
-  "Times New Roman",  0,
-  "Arial Black",      0,
-  "Impact",           0,
-  "Agency FB",        0,
-  "Book Antiqua",     0,
+{  "Courier New",      0},
+{  "Arial",            0},
+{  "Times New Roman",  0},
+{  "Arial Black",      0},
+{  "Impact",           0},
+{  "Agency FB",        0},
+{  "Book Antiqua",     0}
 };
 
 #if SCREENSAVER
@@ -127,7 +127,7 @@ enum
   EFFECT_DEBUG,
   EFFECT_BLOOM_RADIAL,
   EFFECT_COLOR_CYCLE,
-  EFFECT_GLASS_CITY,
+  EFFECT_GLASS_CITY
 };
 #endif 
 
@@ -388,7 +388,7 @@ int RenderMaxTextureSize ()
 
 -----------------------------------------------------------------------------*/
 
-void RenderPrint (int x, int y, int font, GLrgba color, const char *fmt, ...)				
+void RenderPrint (int x, int y, int font, GLrgba color, const char *fmt, ...)
 {
 
   char		  text[MAX_TEXT];	

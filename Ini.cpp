@@ -1,3 +1,4 @@
+#ifndef _lemon
 /*-----------------------------------------------------------------------------
 
   Ini.cpp
@@ -143,3 +144,4 @@ GLvector IniVector (char* entry)
   return v;
 
 }
+#endif
