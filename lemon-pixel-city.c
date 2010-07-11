@@ -80,6 +80,7 @@ class pixel_city: public obj
     }
     void draw (int picking)
     {
+	if(picking==2)return;
 	gle();
         glPushAttrib(GL_ALL_ATTRIB_BITS);
         gle();
